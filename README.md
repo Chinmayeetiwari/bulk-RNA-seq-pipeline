@@ -18,6 +18,7 @@ This project serves both as my learning record and as a reference workflow for o
 6. Visualization (MA plot, Volcano plot, PCA)
 
 ---
+**Raw data & preparation (Fetching SRA and converting to FASTQ)**
 
 ## 📁 Repository Structure
 
