@@ -10,8 +10,8 @@ This project serves both as my learning record and as a reference workflow for o
 
 ---
 ##  Workflow Overview
-1. Raw data & preparation (Fetching SRA and converting to FASTQ)
-2. Quality check (FastQC & MultiQC)
+1. Raw data retrieval & Fastq Conversion
+2. Quality Control (FastQC & MultiQC)
 3. Genome indexing & Alignment (HISAT2)
 4. Read quantification (featureCounts & Count Matrix)
 5. Differential expression analysis (DESeq2)
@@ -73,40 +73,35 @@ python3 bulk_prefetch+fastq_dump.py
 
 You can find the automation script here:  
  **[`scripts/download_sra_fastq_dump.py`](scripts/download_sra_fastq_dump.py)`**
- ## Quality check (FastQC & MultiQC)
+ 
+ ## Quality Control (FastQC & MultiQC)
 
 FastQC is a widely used tool for assessing the quality of raw sequencing data (FASTQ files). It generates visual reports that summarize key quality metrics, including per-base sequence quality, GC content, adapter contamination, sequence length distribution, overrepresented sequences, and duplication levels. These metrics provide an overview of the integrity of the sequencing data and help determine whether the reads are suitable for downstream alignment or if trimming and preprocessing steps are required.
- 
+
+Run FastQC
 ```
 fastqc fastq/*.fastq.gz -o fastqc_results/ --threads 8
 ```
-This command:
-
-Processes all FASTQ files in the fastq/ directory and saves the reports (.html and .zip) in fastqc_results/
+This command processes all FASTQ files in the fastq/ directory and saves the reports (.html and .zip) in fastqc_results/
 
 **MultiQC — Combine All QC Reports into One File**
-When you have many samples, FastQC produces many individual reports.
-MultiQC solves this by gathering all FastQC results and summarizing them into a single, easy-to-read report.
+When you have many samples, FastQC produces many individual reports. MultiQC solves this by gathering all FastQC results and summarizing them into a single, easy-to-read report.
 
 MultiQC is extremely useful for:
 
-Comparing quality across replicates
+-Comparing quality across replicates<br>
 
-Checking batch effects
+-Checking batch effects<br>
 
-Spotting problematic samples
+-Spotting problematic samples<br>
 
-▶️ Run MultiQC
+Run MultiQC
 ```
 multiqc fastqc_results/ -o multiqc_report/
 ```
 This command:
 
-Scans the fastqc_results/ directory
-
-Generates a unified multiqc_report.html
-
-Saves it inside multiqc_report/
+Scans the fastqc_results/ directory and generates a unified multiqc_report.html and saves it inside multiqc_report/ folder.
 
 **Read Trimming (Trimmomatic)**
 
@@ -117,10 +112,10 @@ fastq/SRR7179504.fastq.gz fastq/SRR7179504_trimmed.fastq.gz \
 TRAILING:10 -phred33
 ```
 After trimming, FastQC should be rerun to verify improvement in read quality:
-
+```
 fastqc fastq/SRR7179504_trimmed.fastq.gz -o fastqc_results/ --threads 8
 multiqc fastqc_results/ -o multiqc_report/
-
+```
 
 ## Genome Indexing and Alignment
 
@@ -183,7 +178,7 @@ chmod +x scripts/featurecount.sh
 
 **Count Matrix Generation**
 
-The raw featureCounts output is reformatted into a clean count matrix for downstream analysis. This step is handled by: **[`scripts/countmatrix.sh`]
+The raw featureCounts output is reformatted into a clean count matrix for downstream analysis. This step is handled by:[`scripts/countmatrix.sh`]
 
 Run the script to generate the consolidated count matrix:
 ```
