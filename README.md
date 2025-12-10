@@ -19,6 +19,17 @@ This project serves both as my learning record and as a reference workflow for o
 
 ---
 **Raw data & preparation (Fetching SRA and converting to FASTQ)**
+| Sample | GSM | SRX | SRR Runs |
+|--------|-----|-----|----------|
+| LNCaP EV Normoxia rep1 | GSM3145509 | SRX4096735 | 504, 505, 506, 507 |
+| LNCaP EV Normoxia rep2 | GSM3145510 | SRX4096736 | 508, 509, 510, 511 |
+| LNCaP EV Hypoxia rep1 | GSM3145513 | SRX4096739 | 520, 521, 522, 523 |
+| LNCaP EV Hypoxia rep2 | GSM3145514 | SRX4096740 | 524, 525, 526, 527 |
+| PC3 siCtrl Normoxia rep1 | GSM3145517 | SRX4096743 | 536 |
+| PC3 siCtrl Normoxia rep2 | GSM3145518 | SRX4096744 | 537 |
+| PC3 siCtrl Hypoxia rep1 | GSM3145521 | SRX4096747 | 540 |
+| PC3 siCtrl Hypoxia rep2 | GSM3145522 | SRX4096748 | 541 |
+      
 
 ## 📁 Repository Structure
 
