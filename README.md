@@ -18,7 +18,7 @@ This project serves both as my learning record and as a reference workflow for o
 6. Visualization (MA plot, Volcano plot, PCA)
 
 ---
-## Raw data & preparation (Fetching SRA and converting to FASTQ)**
+##  Raw data retrieval & Fastq Conversion
 
 **Samples from GEO (GSE106305)**
 
@@ -37,8 +37,8 @@ The samples used in this study are listed below:
 | PC3_RNA-Seq_siCtrl_Hypoxia_rep1                | GSM3145521     | SRX4096747           | SRR7179540 |
 | PC3_RNA-Seq_siCtrl_Hypoxia_rep2                | GSM3145522     | SRX4096748           | SRR7179541 |
 
-**Fetching Data from SRA**
-1. Install SRA Toolkit
+** Fetching Data from SRA**
+1.Install SRA Toolkit
 To download sequencing data from the NCBI Sequence Read Archive (SRA), we use the SRA Toolkit.
 It provides tools like prefetch (downloads .sra files) and fastq-dump / fasterq-dump (converts to FASTQ format).
 
@@ -52,7 +52,7 @@ Use prefetch to download; this will download the .sra file into your current dir
 ```
 prefetch SRR7179504
 ```
-Convert ``` .sra ``` to fastq files
+3. Convert ``` .sra ``` to fastq files
    
 ```
 fastq-dump --outdir fastq --gzip --skip-technical --readids --read-filter pass --dumpbase --split-3 --clip SRR7179504.sra
@@ -62,7 +62,7 @@ This creates:
 fastq/SRR7179504_1.fastq.gz
 fastq/SRR7179504_2.fastq.gz
 ```
-3. Automating Downloads for Multiple SRR Ids
+Automating Downloads for Multiple SRR Ids
    
 For automation, first check ```python --version``` then create a Python script that reads a list of SRR IDs and runs prefetch + fastq-dump command for each sample downloaded and logs progress.
 
@@ -71,11 +71,10 @@ To run this script in bash
 python3 bulk_prefetch+fastq_dump.py
 ```
 
-You can find the automation script here:  
- **[`scripts/download_sra_fastq_dump.py`](scripts/download_sra_fastq_dump.py)`**
+You can find the automation script here: **[`scripts/download_sra_fastq_dump.py`](scripts/download_sra_fastq_dump.py)`**
  
  ## Quality Control (FastQC & MultiQC)
-
+**FastQC**<br>
 FastQC is a widely used tool for assessing the quality of raw sequencing data (FASTQ files). It generates visual reports that summarize key quality metrics, including per-base sequence quality, GC content, adapter contamination, sequence length distribution, overrepresented sequences, and duplication levels. These metrics provide an overview of the integrity of the sequencing data and help determine whether the reads are suitable for downstream alignment or if trimming and preprocessing steps are required.
 
 Run FastQC
@@ -84,24 +83,22 @@ fastqc fastq/*.fastq.gz -o fastqc_results/ --threads 8
 ```
 This command processes all FASTQ files in the fastq/ directory and saves the reports (.html and .zip) in fastqc_results/
 
-**MultiQC — Combine All QC Reports into One File**
+**MultiQC**<br>
 When you have many samples, FastQC produces many individual reports. MultiQC solves this by gathering all FastQC results and summarizing them into a single, easy-to-read report.
 
 MultiQC is extremely useful for:
 
 -Comparing quality across replicates<br>
-
 -Checking batch effects<br>
-
--Spotting problematic samples<br>
+-Spotting problematic samples
 
 Run MultiQC
 ```
 multiqc fastqc_results/ -o multiqc_report/
 ```
-This command:
+This command:<br>
 
-Scans the fastqc_results/ directory and generates a unified multiqc_report.html and saves it inside multiqc_report/ folder.
+Scans the fastqc_results directory and generates a unified multiqc_report.html and saves it inside multiqc_report folder.
 
 **Read Trimming (Trimmomatic)**
 
@@ -112,10 +109,6 @@ fastq/SRR7179504.fastq.gz fastq/SRR7179504_trimmed.fastq.gz \
 TRAILING:10 -phred33
 ```
 After trimming, FastQC should be rerun to verify improvement in read quality:
-```
-fastqc fastq/SRR7179504_trimmed.fastq.gz -o fastqc_results/ --threads 8
-multiqc fastqc_results/ -o multiqc_report/
-```
 
 ## Genome Indexing and Alignment
 
@@ -125,7 +118,7 @@ Download GRCh38 Index
 ```
 wget https://genome-idx.s3.amazonaws.com/hisat/grch38_genome.tar.gz
 tar -xvzf grch38_genome.tar.gz
-``
+```
 
 Install Required Tools
 ```
@@ -139,21 +132,14 @@ Manual Alignment Command (Single Sample)
 ```
 Automated Alignment Script
 
-An automated version of this workflow is provided in: [`scripts/hisat2a.sh`]
-
-This script processes multiple FASTQ files and generates sorted and indexed BAM files for all samples.
-To run the automated pipeline:
-```
-chmod +x scripts/hisat2a.sh
-./scripts/hisat2a.sh
-```
+An automated version of this workflow is provided in: [`scripts/hisat2a.sh`] <br>This script processes multiple FASTQ files and generates sorted and indexed BAM files for all samples.
 
 ⚠️ Note for low-RAM systems
 Some alignment steps (HISAT2) may fail on 8 GB RAM.  
 Increasing swap space (16 GB) is recommended.
 
 ## Read quantification (featureCounts & Count Matrix) 
-After alignment, read quantification was performed using featureCounts from the Subread package. This step assigns aligned reads to genomic features (genes) based on the GTF annotation file and produces a table of raw counts for each sample. Gene-level counts are required for downstream differential expression analysis. The annotation file used in the tutorial was Homo_sapiens.GRCh38.99.gtf.gz, but the latest version (Homo_sapiens.GRCh38.114.gtf, Ensembl release) was downloaded for this workflow.
+After alignment, read quantification was performed using featureCounts from the Subread package. This step assigns aligned reads to genomic features (genes) based on the GTF annotation file and produces a table of raw counts for each sample. Gene-level counts are required for downstream differential expression analysis. The latest annotation version (Homo_sapiens.GRCh38.114.gtf, Ensembl release) was downloaded for this workflow.
 
 Install featureCounts
 ```
@@ -167,9 +153,8 @@ featureCounts -S 2 -a Homo_sapiens.GRCh38.114.gtf \
 
 Automated FeatureCounts Script
 
-An automated script for generating counts for multiple BAM files is available in: [`scripts/featurecount.sh`]
-
-This script processes all aligned and sorted BAM files and outputs a single featureCounts table. Run it with:
+An automated script for generating counts for multiple BAM files is available in: [`scripts/featurecount.sh`] <br> This script processes all aligned and sorted BAM files and outputs a single featureCounts table. 
+Run it with:
 
 ```
 chmod +x scripts/featurecount.sh
