@@ -71,6 +71,10 @@ To run this script in bash
 python3 bulk_prefetch+fastq_dump.py
 ```
 
+You can find the automation script here:  
+ **[`scripts/download_sra_fastq_dump.py`](scripts/download_sra_fastq_dump.py)`**
+
+ 
 fastqc fastq/*.fastq.gz -o fastqc_results/ --threads 8
 ## 📁 Repository Structure
 
